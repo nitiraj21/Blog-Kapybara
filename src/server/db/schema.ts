@@ -6,9 +6,8 @@ import {
   text, 
   timestamp, 
   boolean,
-  primaryKey 
 } from 'drizzle-orm/pg-core';
-import { title } from 'process';
+import { relations } from "drizzle-orm";
 
 export const posts = pgTable('posts', {
     id : serial('id').primaryKey(),
@@ -32,3 +31,22 @@ export const postCategories = pgTable("post_categories", {
     postId : integer("post_id").references(()=> posts.id),
     categoryId: integer("category_id").references(() => categories.id),
 })
+
+export const postRelations = relations(posts, ({ many }) => ({
+    postCategories: many(postCategories),
+  }));
+  
+  export const categoryRelations = relations(categories, ({ many }) => ({
+    postCategories: many(postCategories),
+  }));
+  
+  export const postCategoryRelations = relations(postCategories, ({ one }) => ({
+    post: one(posts, {
+      fields: [postCategories.postId],
+      references: [posts.id],
+    }),
+    category: one(categories, {
+      fields: [postCategories.categoryId],
+      references: [categories.id],
+    }),
+  }));

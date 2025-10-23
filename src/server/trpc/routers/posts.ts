@@ -7,7 +7,13 @@ import slugify from "slugify";
 
 export const postRouter = router({
   getAll: procedure.query(async () => {
-    return await db.select().from(posts);
+    return await db.query.posts.findMany({
+      with: {
+        postCategories: {
+          with: { category: true },
+        },
+      },
+    });
   }),
 
   getBySlug: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
