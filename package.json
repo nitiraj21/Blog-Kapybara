@@ -10,6 +10,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.90.5",
     "@trpc/client": "^11.6.0",
+    "@trpc/react-query": "^11.6.0",
     "@trpc/server": "^11.6.0",
     "@vercel/postgres": "^0.10.0",
     "drizzle-orm": "^0.44.6",

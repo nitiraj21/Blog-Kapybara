@@ -23,7 +23,7 @@ export const postRouter = router({
       published: z.boolean().default(false),
     })
   ).mutation(async ({ input }) => {
-    const slug = slugify(input.title, { lower: true });
+    const slug = slugify(input.title, { lower: true }) + "-" + Date.now();
     await db.insert(posts).values({ ...input, slug });
     return { success: true };
   }),
