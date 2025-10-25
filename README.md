@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Blogr Kapybara
+Blogr is a full-stack, type-safe blog platform built with Next.js, tRPC, Drizzle ORM, and PostgreSQL. It features complete CRUD functionality for posts and categories, a dynamic masonry layout, and Markdown support.
 
-## Getting Started
+Features Implemented
+Priority 1: Post Management
+[x] View All Posts: Homepage displays all posts in a responsive masonry layout.
 
-First, run the development server:
+[x] View Single Post: Detailed post view with full content rendering.
 
-```bash
+[x] Create Post: A multi-step form for creating new posts, including title, author, image, description, and content.
+
+[x] Edit Post: Ability to edit a post's title, image URL, and content.
+
+[x] Delete Post: Functionality to delete posts directly from the post page.
+
+Priority 2: Category Management
+[x] Create Categories: A dedicated UI to create new categories with a name and description.
+
+[x] Manage Categories: Edit and delete existing categories from a central management page.
+
+[x] Assign Categories: Assign one or more categories to a post during creation.
+
+[x] Filter by Category: View all posts belonging to a specific category via the navbar or URL.
+
+Priority 3: Styling & UX
+[x] Masonry Layout: Uses GSAP for an animated, responsive masonry grid on post listing pages.
+
+[x] Markdown Support: Posts are written in Markdown and rendered as HTML in both the create-post preview and the final post page.
+
+[x] Navigation: A responsive navbar provides links to home, create post, and a dynamic category dropdown.
+
+[x] Loading States: Implemented loading spinners and messages while data is being fetched.
+
+[x] Form Validation: Client-side validation ensures required fields are filled before submitting forms.
+
+Tech Stack
+Framework: Next.js 16 (App Router)
+
+API & Type-Safety: tRPC (end-to-end type-safe APIs)
+
+Database: PostgreSQL
+
+ORM: Drizzle ORM (with Drizzle Kit for migrations)
+
+Styling: Tailwind CSS
+
+UI Components: React, lucide-react (icons), ShadCN UI
+
+Server State: @tanstack/react-query (via tRPC)
+
+Content: react-markdown (for rendering post content)
+
+Animations: GSAP (for masonry layout)
+
+Deployment: Vercel Postgres (SDK)
+
+Setup Steps (How to Run Locally)
+Clone the Repository
+
+Bash
+
+git clone https://github.com/nitiraj21/blog-kapybara.git
+cd blog-kapybara
+Install Dependencies
+
+Bash
+
+npm install
+Set Up Environment Variables Create a .env file in the root of the project and add your PostgreSQL connection string:
+
+Code snippet
+
+DATABASE_URL="postgresql://user:password@host:port/database"
+This is required by Drizzle to connect to your database.
+
+Run Database Migrations Run the Drizzle Kit migrations to set up your database schema:
+
+Bash
+
+npm run drizzle-kit push
+(Note: You might need to add this script to your package.json or run npx drizzle-kit push)
+
+Run the Development Server
+
+Bash
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The application will be available at http://localhost:3000.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+tRPC Architecture
+This project leverages tRPC for end-to-end type-safe API development.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Server Initialization: The tRPC server is initialized in src/server/trpc/index.ts.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Routers: API logic is modularized into routers:
 
-## Learn More
+src/server/trpc/routers/posts.ts: Handles all CRUD operations for posts.
 
-To learn more about Next.js, take a look at the following resources:
+src/server/trpc/routers/category.ts: Handles all CRUD operations for categories.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Root Router: These routers are combined into a single appRouter in src/server/trpc/root.ts.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+API Handler: The appRouter is exposed as a Next.js API route in src/app/api/trpc/[trpc]/route.ts.
 
-## Deploy on Vercel
+Client Configuration: A type-safe client is created in src/utils/trpc.ts.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Provider: The entire application is wrapped in a TrpcProvider in src/app/layout.tsx (defined in src/components/provider/trpc_provider.tsx), which provides the tRPC client and React Query context to all components.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This setup allows you to call backend procedures from your frontend components with full autocompletion and type-checking, as if you were calling a local function.
+
+Trade-offs & Decisions
+Slug Generation: To ensure post slugs are always unique, the Date.now() timestamp is appended to the slugified title (e.g., my-post-title-1678886400000). This is a simple trade-off to avoid conflicts without needing complex slug-checking logic, though it results in less "clean" URLs.
+
+Database Schema: I chose Drizzle ORM for its type-safety and alignment with a TypeScript-first approach. The schema definition in src/server/db/schema.ts is the single source of truth for database types.
+
+Cascade Deletes: The post_categories join table uses onDelete: "cascade" for its foreign keys. This simplifies the application logic, as deleting a post or a category automatically removes the corresponding entries in the join table. The trade-off is that this places delete logic squarely in the database, which is efficient but less explicit in the application code.
+
+State Management: The project relies heavily on tRPC's built-in @tanstack/react-query integration for managing server state (caching, mutations, etc.). Simple local UI state (like forms) is handled by useState. This avoids the overhead of a global state manager like Zustand or Redux for a use case that is primarily server-state-driven.
+
+Time Spent
+(Please fill in as appropriate)
+
+Estimated Time:
+
+Actual Time:
