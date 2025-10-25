@@ -1,10 +1,8 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { string } from 'zod';
 
 const useMedia = (queries: string[], values: number[], defaultValue: number): number => {
   const get = () => values[queries.findIndex(q => matchMedia(q).matches)] ?? defaultValue;
-
   const [value, setValue] = useState<number>(get);
 
   useEffect(() => {
@@ -236,7 +234,6 @@ const Masonry: React.FC<MasonryProps> = ({
           className="relative w-full h-full bg-cover bg-center rounded-[10px] shadow-[0px_10px_50px_-10px_rgba(0,0,0,0.2)] overflow-hidden cursor-pointer"
           style={{ backgroundImage: `url(${item.img})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
   
           <div className="absolute bottom-0 w-full p-3 text-white">
             <h1 className="text-lg font-semibold truncate">{item.title}</h1>

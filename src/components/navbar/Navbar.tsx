@@ -21,9 +21,10 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-gray-900">
-            Blogr
-            </span>
+            <div className='flex justify-center items-center gap-2'>
+                <img src={"/BlogrIcon.png"} height={45} width={45}/>
+                <span className='text-lg font-semibold text-gray-600'>Blogr</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
