@@ -3,7 +3,9 @@
 Blogr is a full-stack, type-safe blog platform built with Next.js, tRPC, Drizzle ORM, and PostgreSQL. It features complete CRUD functionality for posts and categories, a dynamic masonry layout, and Markdown support.
 
 
-
+## Live Link 
+[https://blog-kapybara.vercel.app/](https://blog-kapybara.vercel.app/)
+    
 ## Features Implemented
 
 ### Priority 1: Post Management
