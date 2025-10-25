@@ -1,8 +1,8 @@
 "use client";
-
 import Masonry from "@/components/masonry/Masonry";
 import { categories, postCategories } from "@/server/db/schema";
 import { trpc } from "@/utils/trpc";
+import { useParams, useSearchParams } from "next/navigation";
 
 type Item = {
   id: string;
@@ -14,15 +14,21 @@ type Item = {
   categories: string[];
 };
 
-export default function Home() {
-  const { data: posts, isLoading } = trpc.post.getAll.useQuery();
+export default function Home() {  
+    const params  = useParams()
+    const selectedCategory = params.slug as string
+  
+    const { data: posts, isLoading } = trpc.post.getAll.useQuery({
+      categorySlug: selectedCategory
+    });
+  
 
-  if (isLoading) return
-  <div className="flex justify-start items-center gap-2 text-black py-4 z-50 h-full">
-  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 z-50"></div>
-  <span>Loading</span>
-</div>
-
+  if (isLoading) return(
+    <div className="flex justify-center items-center h-screen gap-3">
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+    <span>Loading ...</span>
+  </div>
+  )
   if(!isLoading){
     console.log(posts)
   }
@@ -36,6 +42,15 @@ export default function Home() {
     slug: p.slug, // aesthetic height variation
     categories: p.postCategories.map((pc) => pc.category?.name || "Unknown")
   })) || [];
+
+
+  if(posts?.length == 0){
+    return(
+      <div className="flex justify-center items-center h-screen">
+        No Posts on this Topic Yet
+      </div>
+    )
+  }
 
   return (
     <main className="p-8 space-y-4">

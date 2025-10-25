@@ -7,11 +7,13 @@ import ReactMarkdown from 'react-markdown';
 
 interface PostFormData {
   title: string;
-  slug : string,
-  user : string,
-  description : string,
+  slug: string;
+  author: string;
+  imageUrl: string;
+  description: string;
   content: string;
   published: boolean;
+  categoryIds: number[];
 }
 
 export default function CreatePostForm() {
@@ -19,14 +21,19 @@ export default function CreatePostForm() {
   const [step, setStep] = useState<'basic' | 'content'>('basic');
   const [formData, setFormData] = useState<PostFormData>({
     title: '',
-    slug : '',
-    user : '',
+    slug: '',
+    author: '',
+    imageUrl: '',
     content: '',
-    description : '',
+    description: '',
     published: false,
+    categoryIds: [],
   });
   const [showPreview, setShowPreview] = useState(false);
   const [error, setError] = useState('');
+
+  // Fetch categories
+  const { data: categories, isLoading: categoriesLoading } = trpc.category.getAll.useQuery();
 
   const createPostMutation = trpc.post.create.useMutation({
     onSuccess: () => {
@@ -42,6 +49,22 @@ export default function CreatePostForm() {
     
     if (!formData.title.trim()) {
       setError('Title is required');
+      return;
+    }
+    if (!formData.author.trim()) {
+      setError('Author is required');
+      return;
+    }
+    if (!formData.description.trim()) {
+      setError('Description is required');
+      return;
+    }
+    if (!formData.imageUrl.trim()) {
+      setError('Image URL is required');
+      return;
+    }
+    if (formData.categoryIds.length === 0) {
+      setError('Please select at least one category');
       return;
     }
     
@@ -62,6 +85,15 @@ export default function CreatePostForm() {
     }
 
     createPostMutation.mutate(formData);
+  };
+
+  const toggleCategory = (categoryId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      categoryIds: prev.categoryIds.includes(categoryId)
+        ? prev.categoryIds.filter(id => id !== categoryId)
+        : [...prev.categoryIds, categoryId]
+    }));
   };
 
   return (
@@ -102,64 +134,122 @@ export default function CreatePostForm() {
               required
               autoFocus
             />
-            
-            <p className="text-sm text-gray-500 mt-2">
-              A unique slug will be auto-generated: <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">{formData.title ? `${formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}` : 'your-title-timestamp'}</span>
-            </p>
           </div>
 
+          {/* Author */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-2">
-              User <span className="text-red-500">*</span>
+            <label htmlFor="author" className="block text-sm font-medium mb-2">
+              Author <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              id="user"
-              value={formData.user}
-              onChange={(e) => setFormData(prev => ({ ...prev, user: e.target.value }))}
-              className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter an engaging title for your post"
+              id="author"
+              value={formData.author}
+              onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter author name"
               required
-              autoFocus
             />
           </div>
 
+          {/* Description */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-2">
+            <label htmlFor="description" className="block text-sm font-medium mb-2">
               Description <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <textarea
               id="description"
-              value={formData.user}
+              value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter an engaging title for your post"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              placeholder="Brief description of your post (2-3 sentences)"
+              rows={3}
               required
-              autoFocus
             />
           </div>
 
-          
-
-          {/* Published Status */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <label className="flex items-start space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.published}
-                onChange={(e) => setFormData(prev => ({ ...prev, published: e.target.checked }))}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 mt-0.5"
-              />
-              <div>
-                <span className="text-sm font-medium block">Publish immediately</span>
-                <span className="text-sm text-gray-600">
-                  {formData.published 
-                    ? 'Post will be visible to everyone after creation' 
-                    : 'Post will be saved as a draft'}
-                </span>
-              </div>
+          {/* Image URL */}
+          <div>
+            <label htmlFor="imageUrl" className="block text-sm font-medium mb-2">
+              Image URL <span className="text-red-500">*</span>
             </label>
+            <input
+              type="url"
+              id="imageUrl"
+              value={formData.imageUrl}
+              onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="https://example.com/image.jpg"
+              required
+            />
+            {formData.imageUrl && (
+              <div className="mt-3">
+                <p className="text-xs text-gray-500 mb-2">Image Preview:</p>
+                <img 
+                  src={formData.imageUrl} 
+                  alt="Preview" 
+                  className="w-full max-w-md h-48 object-cover rounded-lg shadow-sm"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Categories */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Categories <span className="text-red-500">*</span>
+            </label>
+            {categoriesLoading ? (
+              <div className="flex items-center gap-2 text-gray-500 py-4">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <span>Loading categories...</span>
+              </div>
+            ) : categories && categories.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {categories.map((category) => (
+                    <label
+                      key={category.id}
+                      className={`flex items-center gap-2 px-4 py-3 border rounded-lg cursor-pointer transition-all ${
+                        formData.categoryIds.includes(category.id)
+                          ? 'bg-blue-50 border-blue-500 text-blue-700 font-medium shadow-sm'
+                          : 'bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.categoryIds.includes(category.id)}
+                        onChange={() => toggleCategory(category.id)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm">{category.name}</span>
+                    </label>
+                  ))}
+                </div>
+                {formData.categoryIds.length > 0 && (
+                  <p className="mt-3 text-sm text-gray-600 bg-blue-50 px-3 py-2 rounded-md inline-block">
+                    ✓ {formData.categoryIds.length} {formData.categoryIds.length === 1 ? 'category' : 'categories'} selected
+                  </p>
+                )}
+              </>
+            ) : (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p className="text-amber-800 text-sm mb-2">
+                  ⚠️ No categories available. Please create categories first.
+                </p>
+                <a 
+                  href="/admin/categories" 
+                  className="text-sm text-blue-600 hover:text-blue-700 underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Go to Category Management →
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
@@ -183,10 +273,22 @@ export default function CreatePostForm() {
 
       {step === 'content' && (
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Post Title Display */}
-          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-            <p className="text-sm text-blue-600 font-medium mb-1">Creating post:</p>
+          {/* Post Info Display */}
+          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg space-y-2">
+            <p className="text-sm text-blue-600 font-medium">Creating post:</p>
             <h2 className="text-xl font-bold text-gray-900">{formData.title}</h2>
+            <div className="flex flex-wrap gap-2">
+              {categories
+                ?.filter(c => formData.categoryIds.includes(c.id))
+                .map(category => (
+                  <span 
+                    key={category.id}
+                    className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                  >
+                    {category.name}
+                  </span>
+                ))}
+            </div>
           </div>
 
           {/* Editor Controls */}
@@ -264,15 +366,15 @@ Happy writing! 🚀"
           <div className="flex gap-4 pt-4 border-t">
             <button
               type="submit"
-              disabled={createPostMutation.isLoading}
+              disabled={createPostMutation.isPending}
               className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              {createPostMutation.isLoading ? 'Creating...' : '✓ Create Post'}
+              {createPostMutation.isPending ? 'Creating...' : 'Create Post'}
             </button>
             <button
               type="button"
               onClick={handleBack}
-              disabled={createPostMutation.isLoading}
+              disabled={createPostMutation.isPending}
               className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 font-medium"
             >
               ← Back
@@ -280,7 +382,7 @@ Happy writing! 🚀"
             <button
               type="button"
               onClick={() => router.back()}
-              disabled={createPostMutation.isLoading}
+              disabled={createPostMutation.isPending}
               className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 disabled:opacity-50 font-medium ml-auto"
             >
               Cancel

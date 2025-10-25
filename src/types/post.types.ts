@@ -2,7 +2,7 @@ export interface PostFormData {
     title: string;
     slug: string;
     imageUrl: string;
-    createdBy: string;
+    author: string;
     categoryIds: number[];
     content: string;
   }

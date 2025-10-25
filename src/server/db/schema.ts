@@ -14,6 +14,8 @@ export const posts = pgTable('posts', {
     title : varchar('title', {length : 255}).notNull(),
     slug : varchar('slug').notNull().unique(),
     content : text("content").notNull(),
+    author : text("author").notNull().default('Anonymous'),
+    imageUrl : text("imageUrl"),
     published : boolean("published").default(false),
     createdAt : timestamp("created_at").defaultNow()
 
@@ -28,9 +30,12 @@ export const categories = pgTable('categories',{
 })
 
 export const postCategories = pgTable("post_categories", {
-    postId : integer("post_id").references(()=> posts.id),
-    categoryId: integer("category_id").references(() => categories.id),
-})
+  postId: integer("post_id")
+    .references(() => posts.id, { onDelete: "cascade" }),
+  categoryId: integer("category_id")
+    .references(() => categories.id, { onDelete: "cascade" }),
+});
+
 
 export const postRelations = relations(posts, ({ many }) => ({
     postCategories: many(postCategories),
