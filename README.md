@@ -8,22 +8,22 @@ Blogr is a full-stack, type-safe blog platform built with Next.js, tRPC, Drizzle
 
 ### Priority 1: Post Management
 * [x] **View All Posts:** Homepage displays all posts in a responsive masonry layout.
-* [x] **View Single Post:** Detailed post view with full content rendering./page.tsx, nitiraj21/blog-kapybara/Blog-Kapybara-64cca09df18e1721c72eff9a742f7aa6a6b1dfcd/src/components/Post/Post.tsx]
+* [x] **View Single Post:** Detailed post view with full content rendering./page.tsx
 * [x] **Create Post:** A multi-step form for creating new posts, including title, author, image, description, and content.
-* [x] **Edit Post:** Ability to edit a post's title, image URL, and content./page.tsx, nitiraj21/blog-kapybara/Blog-Kapybara-64cca09df18e1721c72eff9a742f7aa6a6b1dfcd/src/server/trpc/routers/posts.ts]
+* [x] **Edit Post:** Ability to edit a post's title, image URL, and content./page.tsx,
 * [x] **Delete Post:** Functionality to delete posts directly from the post page.
 
 ### Priority 2: Category Management
 * [x] **Create Categories:** A dedicated UI to create new categories with a name and description.
 * [x] **Manage Categories:** Edit and delete existing categories from a central management page.
 * [x] **Assign Categories:** Assign one or more categories to a post during creation.
-* [x] **Filter by Category:** View all posts belonging to a specific category via the navbar or URL./page.tsx, nitiraj21/blog-kapybara/Blog-Kapybara-64cca09df18e1721c72eff9a742f7aa6a6b1dfcd/src/components/navbar/Navbar.tsx]
+* [x] **Filter by Category:** View all posts belonging to a specific category via the navbar or URL
 
 ### Priority 3: Styling & UX
 * [x] **Masonry Layout:** Uses GSAP for an animated, responsive masonry grid on post listing pages.
 * [x] **Markdown Support:** Posts are written in Markdown and rendered as HTML in both the create-post preview and the final post page.
 * [x] **Navigation:** A responsive navbar provides links to home, create post, and a dynamic category dropdown.
-* [x] **Loading States:** Implemented loading spinners and messages while data is being fetched./page.tsx]
+* [x] **Loading States:** Implemented loading spinners and messages while data is being fetched
 * [x] **Form Validation:** Client-side validation ensures required fields are filled before submitting forms.
 
 ---
@@ -35,7 +35,7 @@ Blogr is a full-stack, type-safe blog platform built with Next.js, tRPC, Drizzle
 * **Database:** **PostgreSQL**
 * **ORM:** **Drizzle ORM** (with Drizzle Kit for migrations)
 * **Styling:** **Tailwind CSS**
-* **UI Components:** **React**, `lucide-react` (icons)
+* **UI Components:** **React**, `lucide-react` (icons), ShadCN UI
 * **Server State:** **@tanstack/react-query** (via tRPC)
 * **Content:** **`react-markdown`** (for rendering post content)
 * **Animations:** **GSAP** (for masonry layout)
@@ -91,19 +91,7 @@ This project leverages tRPC for end-to-end type-safe API development.
 
 This setup allows you to call backend procedures from your frontend components with full autocompletion and type-checking, as if you were calling a local function.
 
----
 
-## Trade-offs & Decisions
-
-* **Slug Generation:** To ensure post slugs are always unique, the `Date.now()` timestamp is appended to the slugified title (e.g., `my-post-title-1678886400000`). This is a simple trade-off to avoid conflicts without needing complex slug-checking logic, though it results in less "clean" URLs.
-* **Database Schema:** I chose Drizzle ORM for its type-safety and alignment with a TypeScript-first approach. The schema definition in `src/server/db/schema.ts` is the single source of truth for database types.
-* **Cascade Deletes:** The `post_categories` join table uses `onDelete: "cascade"` for its foreign keys. This simplifies the application logic, as deleting a post or a category automatically removes the corresponding entries in the join table. The trade-off is that this places delete logic squarely in the database, which is efficient but less explicit in the application code.
-* **State Management:** The project relies heavily on `tRPC`'s built-in `@tanstack/react-query` integration for managing server state (caching, mutations, etc.). Simple local UI state (like forms) is handled by `useState`. This avoids the overhead of a global state manager for a use case that is primarily server-state-driven.
-
----
 
 ## Time Spent
-
-*(Please fill in as appropriate)*
-* **Estimated Time:**
-* **Actual Time:**
+* **Actual Time:** 7 Hours
