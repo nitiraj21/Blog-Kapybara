@@ -48,7 +48,7 @@ Blogr is a full-stack, type-safe blog platform built with Next.js, tRPC, Drizzle
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/nitiraj21/blog-kapybara.git](https://github.com/nitiraj21/blog-kapybara.git)
+    git clone https://github.com/nitiraj21/blog-kapybara.git
     cd blog-kapybara
     ```
 
