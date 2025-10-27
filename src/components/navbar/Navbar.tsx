@@ -45,7 +45,7 @@ export default function Navbar() {
             <Link
               href="/createPost"
               className={`text-sm font-medium transition-colors ${
-                isActive('/create')
+                isActive('/createPost')
                   ? 'text-blue-600'
                   : 'text-gray-700 hover:text-blue-600'
               }`}
